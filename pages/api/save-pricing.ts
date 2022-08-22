@@ -1,22 +1,20 @@
-import * as Joi from '@hapi/joi'
+import { z } from 'zod'
 
 
 
-// This is the JOI validation schema, you define
+// This is the Zod validation schema, you define
 // all the validation logic in here, then run
 // the validation during the request lifecycle.
 // If you prefer to use your own way of validating the 
 // incoming data, you can use it.
-const schema = Joi.object<import('../../types').Matrix>({
+const Body = z.object({
 
 })
 
 export default async (req: import('next').NextApiRequest, res: import('next').NextApiResponse) => {
   try {
     // This will throw when the validation fails
-    const data = await schema.validateAsync(req.body, {
-      abortEarly: false
-    }) as import('../../types').Matrix
+    const data = await Body.safeParse(req.body)
 
     // Write the new matrix to public/pricing.json
 
@@ -24,12 +22,11 @@ export default async (req: import('next').NextApiRequest, res: import('next').Ne
     res.json(data)
   } catch(e) {
     console.error(e)
-    if(e.isJoi) {
+    // if(e) {
       // Handle the validation error and return a proper response
-      res.statusCode = 422
-      res.end('Error')
-      return
-    }
+
+      // return
+    // }
     
     res.statusCode = 500
     res.json({ error: 'Unknown Error' })
